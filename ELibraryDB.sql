@@ -1,10 +1,10 @@
-﻿USE [master]
+USE [master]
 GO
-/****** Object:  Database [ELibraryDB]    Script Date: 4/4/2023 2:29:58 AM ******/
+/****** Object:  Database [ELibraryDB]    Script Date: 4/25/2023 10:14:38 AM ******/
 CREATE DATABASE [ELibraryDB]
  CONTAINMENT = NONE
  ON  PRIMARY 
-( NAME = N'ELibraryDB', FILENAME = N'D:\SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\ELibraryDB.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+( NAME = N'ELibraryDB', FILENAME = N'D:\SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\ELibraryDB.mdf' , SIZE = 73728KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
  LOG ON 
 ( NAME = N'ELibraryDB_log', FILENAME = N'D:\SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\ELibraryDB_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
  WITH CATALOG_COLLATION = DATABASE_DEFAULT, LEDGER = OFF
@@ -84,7 +84,7 @@ ALTER DATABASE [ELibraryDB] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANU
 GO
 USE [ELibraryDB]
 GO
-/****** Object:  Table [dbo].[Books]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  Table [dbo].[Books]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -110,7 +110,7 @@ CREATE TABLE [dbo].[Books](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[BookAuthors]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  Table [dbo].[BookAuthors]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -125,7 +125,7 @@ CREATE TABLE [dbo].[BookAuthors](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Authors]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  Table [dbo].[Authors]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -137,13 +137,14 @@ CREATE TABLE [dbo].[Authors](
 	[LastName] [nvarchar](50) NOT NULL,
 	[ContactId] [int] NOT NULL,
 	[Bio] [nvarchar](250) NULL,
+	[Password] [nvarchar](350) NULL,
  CONSTRAINT [PK_Authors] PRIMARY KEY CLUSTERED 
 (
 	[AuthorId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  View [dbo].[AuthorsView]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  View [dbo].[AuthorsView]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -156,7 +157,7 @@ SELECT FirstName , MiddleName, Lastname , STRING_AGG(Title,',') [Titles Worked O
 LEFT JOIN BookAuthors ON Authors.AuthorId = BookAuthors.AuthorId LEFT JOIN Books ON BookAuthors.BookId = Books.BookId
 GROUP BY FirstName,MiddleName,LastName
 GO
-/****** Object:  Table [dbo].[Categories]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  Table [dbo].[Categories]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -170,7 +171,7 @@ CREATE TABLE [dbo].[Categories](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  View [dbo].[BooksView]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  View [dbo].[BooksView]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -208,7 +209,7 @@ FROM Books
 LEFT JOIN CTE ON Books.BookId = CTE.BookId
 LEFT JOIN Categories ON Books.CategoryId = Categories.CategoryId
 GO
-/****** Object:  Table [dbo].[Borrowings]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  Table [dbo].[Borrowings]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -227,24 +228,7 @@ CREATE TABLE [dbo].[Borrowings](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Borrowers]    Script Date: 4/4/2023 2:29:59 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[Borrowers](
-	[BorrowerId] [int] IDENTITY(1,1) NOT NULL,
-	[FirstName] [nvarchar](50) NOT NULL,
-	[MiddleName] [nvarchar](50) NULL,
-	[LastName] [nvarchar](50) NOT NULL,
-	[ContactId] [int] NOT NULL,
- CONSTRAINT [PK_Borrowers] PRIMARY KEY CLUSTERED 
-(
-	[BorrowerId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[ContactDetails]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  Table [dbo].[ContactDetails]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -260,7 +244,25 @@ CREATE TABLE [dbo].[ContactDetails](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Reviews]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  Table [dbo].[Borrowers]    Script Date: 4/25/2023 10:14:39 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Borrowers](
+	[BorrowerId] [int] IDENTITY(1,1) NOT NULL,
+	[FirstName] [nvarchar](50) NOT NULL,
+	[MiddleName] [nvarchar](50) NULL,
+	[LastName] [nvarchar](50) NOT NULL,
+	[ContactId] [int] NOT NULL,
+	[Password] [nvarchar](350) NULL,
+ CONSTRAINT [PK_Borrowers] PRIMARY KEY CLUSTERED 
+(
+	[BorrowerId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Reviews]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -278,7 +280,7 @@ CREATE TABLE [dbo].[Reviews](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  View [dbo].[BorrowersView]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  View [dbo].[BorrowersView]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -299,7 +301,7 @@ LEFT JOIN Borrowings ON Borrowings.BorrowerId = Borrowers.BorrowerId
 LEFT JOIN CTE1 ON Borrowers.BorrowerId = CTE1.BorrowerId 
 LEFT JOIN CTE2 ON Borrowers.BorrowerId = CTE2.BorrowerId
 GO
-/****** Object:  View [dbo].[ActiveBorrowings]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  View [dbo].[ActiveBorrowings]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -328,7 +330,7 @@ JOIN CTE2 ON Borrowings.BorrowedBookId = CTE2.BookId
 JOIN ContactDetails ON Borrowers.BorrowerId = ContactDetails.ContactId
 WHERE [Status] = 0
 GO
-/****** Object:  Table [dbo].[Publishers]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  Table [dbo].[Publishers]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -337,6 +339,7 @@ CREATE TABLE [dbo].[Publishers](
 	[PublisherId] [int] IDENTITY(1,1) NOT NULL,
 	[PublisherName] [nvarchar](250) NOT NULL,
 	[ContactId] [int] NOT NULL,
+	[Password] [nvarchar](350) NULL,
  CONSTRAINT [PK_Publishers] PRIMARY KEY CLUSTERED 
 (
 	[PublisherId] ASC
@@ -391,6 +394,13 @@ ON UPDATE CASCADE
 ON DELETE CASCADE
 GO
 ALTER TABLE [dbo].[Borrowings] CHECK CONSTRAINT [FK_Borrowings_Borrowers]
+GO
+ALTER TABLE [dbo].[Publishers]  WITH CHECK ADD  CONSTRAINT [FK_Publishers_ContactDetails] FOREIGN KEY([ContactId])
+REFERENCES [dbo].[ContactDetails] ([ContactId])
+ON UPDATE CASCADE
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[Publishers] CHECK CONSTRAINT [FK_Publishers_ContactDetails]
 GO
 ALTER TABLE [dbo].[Reviews]  WITH CHECK ADD  CONSTRAINT [FK_Reviews_Books] FOREIGN KEY([BookId])
 REFERENCES [dbo].[Books] ([BookId])
@@ -456,7 +466,7 @@ ALTER TABLE [dbo].[Reviews]  WITH CHECK ADD  CONSTRAINT [Review Date Not Impossi
 GO
 ALTER TABLE [dbo].[Reviews] CHECK CONSTRAINT [Review Date Not Impossible]
 GO
-/****** Object:  StoredProcedure [dbo].[Borrow]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[Borrow]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -479,7 +489,7 @@ DATEADD(day,@DueInDays,GETDATE()),
 )
 END
 GO
-/****** Object:  StoredProcedure [dbo].[DeleteAuthor]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[DeleteAuthor]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -491,7 +501,7 @@ BEGIN
 DELETE FROM Authors WHERE AuthorId = @authorid;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[DeleteBook]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[DeleteBook]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -503,7 +513,7 @@ BEGIN
 DELETE FROM Books WHERE BookId = @BookId;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[DeleteBorrower]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[DeleteBorrower]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -515,7 +525,7 @@ BEGIN
 DELETE FROM Borrowers WHERE BorrowerId = @BorrowerId;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetABookISBN]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetABookISBN]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -527,7 +537,7 @@ BEGIN
 SELECT ISBN FROM Books WHERE BookId = @BookId;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetAllBooks]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetAllBooks]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -567,7 +577,7 @@ LEFT JOIN CTE ON Books.BookId = CTE.BookId
 LEFT JOIN Categories ON Books.CategoryId = Categories.CategoryId
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetAuthorContact]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetAuthorContact]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -587,7 +597,7 @@ ON Authors.ContactId = ContactDetails.ContactId
 WHERE AuthorId = @id
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetAuthors]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetAuthors]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -613,7 +623,7 @@ ON Authors.ContactId = ContactDetails.ContactId
 JOIN CTE ON Authors.AuthorId = CTE.Authorid
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetAuthorsWithBooks]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetAuthorsWithBooks]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -633,7 +643,7 @@ GROUP BY Authors.AuthorId,FirstName,MiddleName,LastName
 ORDER BY [Number Of Books] DESC
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetAvaliableBooks]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetAvaliableBooks]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -645,7 +655,7 @@ SELECT Title , Price, Pages , IIF(Avaliable > 0 , 'Avaliable','Not Avaliable') [
 ORDER BY Pages DESC
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetBooksByCategory]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetBooksByCategory]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -658,7 +668,7 @@ ON Books.CategoryId = Categories.CategoryId
 ORDER BY Categories.CategoryId DESC
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetBooksByPages]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetBooksByPages]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -676,7 +686,7 @@ END [Book Size]
 ORDER BY Pages DESC
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetBooksByPrice]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetBooksByPrice]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -689,7 +699,7 @@ ON Books.CategoryId = Categories.CategoryId
 ORDER BY Categories.CategoryId DESC
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetBooksByReviews]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetBooksByReviews]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -708,7 +718,7 @@ Books ON Books.BookId = CTE.BookId
 ORDER BY [Average Rating] DESC
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetBooksInACategory]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetBooksInACategory]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -722,7 +732,7 @@ JOIN Books ON Categories.CategoryId = Books.CategoryId
 WHERE Category = @Category
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetBooksInAYear]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetBooksInAYear]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -736,7 +746,7 @@ Where Year([Publication Date]) = @Year
 ORDER BY Avaliable DESC , Price ASC
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetBooksWithinAPriceRange]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetBooksWithinAPriceRange]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -751,7 +761,7 @@ Where Price BETWEEN @low AND @high
 ORDER BY Avaliable DESC , Price ASC
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetBorrowers]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetBorrowers]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -775,7 +785,7 @@ LEFT JOIN CTE1 ON Borrowers.BorrowerId = CTE1.BorrowerId
 LEFT JOIN CTE2 ON Borrowers.BorrowerId = CTE2.BorrowerId
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetBorrowings]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetBorrowings]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -804,7 +814,7 @@ JOIN CTE ON Borrowings.BorrowerId = CTE.BorrowerId
 JOIN CTE2 ON Borrowings.BorrowedBookId = CTE2.BookId
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetCategories]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[GetCategories]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -817,7 +827,7 @@ JOIN Books ON Categories.CategoryId = Books.CategoryId
 GROUP BY Category
 END
 GO
-/****** Object:  StoredProcedure [dbo].[InsertAuthor]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[InsertAuthor]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -834,7 +844,7 @@ BEGIN
     VALUES (@firstname, @middlename, @lastname, @contactid, @bio)
 END
 GO
-/****** Object:  StoredProcedure [dbo].[InsertBook]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[InsertBook]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -857,7 +867,7 @@ VALUES
 (@Title,@Publisher,@Date,@ISBN,@Pages,@Avaliable,@Price,@CategoryId,@Description);
 END
 GO
-/****** Object:  StoredProcedure [dbo].[InsertBorrower]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[InsertBorrower]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -875,7 +885,7 @@ VALUES
 (@Firstname,@MiddleName,@LastName,@ContactId)
 END
 GO
-/****** Object:  StoredProcedure [dbo].[ReturnBook]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[ReturnBook]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -888,7 +898,7 @@ BEGIN
 UPDATE Borrowings SET [Return Date] = GETDATE() , [Status] = 1 WHERE BorrowedBookId = @BookId AND BorrowerId = @BorrowerId;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[SearchBook]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[SearchBook]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -946,7 +956,7 @@ GROUP BY
         OR (@Publisher IS NOT NULL AND Publishers.PublisherName LIKE '%' + @Publisher + '%')
 END
 GO
-/****** Object:  StoredProcedure [dbo].[UpdateAuthor]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[UpdateAuthor]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -962,7 +972,7 @@ DECLARE @Sql NVARCHAR(MAX);
 EXEC(@Sql)
 END
 GO
-/****** Object:  StoredProcedure [dbo].[UpdateBook]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[UpdateBook]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -978,7 +988,7 @@ DECLARE @Sql NVARCHAR(MAX);
 EXEC(@Sql)
 END
 GO
-/****** Object:  StoredProcedure [dbo].[UpdateBorrower]    Script Date: 4/4/2023 2:29:59 AM ******/
+/****** Object:  StoredProcedure [dbo].[UpdateBorrower]    Script Date: 4/25/2023 10:14:39 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
